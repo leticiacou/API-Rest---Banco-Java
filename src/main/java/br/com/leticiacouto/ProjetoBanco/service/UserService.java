@@ -29,6 +29,8 @@ public class UserService {
 
         if(userdto.getPassword().length() < 8){
             throw new Error("Erro ao criar o usuário, senha fraca");
+        }else if(!userdto.getPassword().matches(".*[!@#$%^&*(),.?\":{}|<>\\-_+=\\[\\]/\\\\'`~].*")){
+            throw new Error("Erro ao criar o usuário, a senha precisa conter pelo menos um caractere especial");
         }else if(userdto.getEmail().length() < 8){
             throw new Error("Erro ao criar o usuário, email inválido");
         }else if(userdto.getName().length() < 4){
