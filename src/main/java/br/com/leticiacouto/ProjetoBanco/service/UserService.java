@@ -30,6 +30,8 @@ public class UserService {
 
         if(userdto.getPassword().length() < 8){
             throw new BusinessException("Erro ao criar a senha, insira no mínimo 8 caracteres");
+        }else if(!userdto.getPassword().matches(".*[!@#$%^&*(),.?\":{}|<>\\-_+=\\[\\]/\\\\'`~].*")){
+            throw new BusinessException("Erro ao criar o usuário, a senha precisa conter pelo menos um caractere especial");
         }else if(userdto.getEmail().length() < 8){
             throw new BusinessException("Erro ao criar o usuário, email inválido");
         }else if(userdto.getName().length() < 4){
