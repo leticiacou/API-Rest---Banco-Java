@@ -3,6 +3,8 @@ package br.com.leticiacouto.ProjetoBanco.service;
 import br.com.leticiacouto.ProjetoBanco.database.model.Account;
 import br.com.leticiacouto.ProjetoBanco.database.repository.Database;
 import br.com.leticiacouto.ProjetoBanco.dto.TransferDto;
+import br.com.leticiacouto.ProjetoBanco.exceptions.BusinessException;
+import br.com.leticiacouto.ProjetoBanco.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,20 +29,20 @@ public class AccountService {
         if (!idExist) {
             database.getAccounts().add(newAccount);
         }else{
-            throw new RuntimeException("A conta já existe");
+            throw new BusinessException("A conta já existe");
         }
 
         boolean userExist = database.getUsers().stream()
                 .anyMatch(user -> user.getId() == newAccount.getUserId());
         if(!userExist){
-            throw new Error("O usuário não foi encontrado");
+            throw new ResourceNotFoundException("O usuário não foi encontrado");
         }
 
         boolean moreThanOne = database.getAccounts().stream()
                 .filter(acc -> acc.getUserId() == newAccount.getUserId())
                 .count() > 1;
         if (moreThanOne) {
-            throw new Error("O usuário já tem uma conta ativa");
+            throw new BusinessException("O usuário já tem uma conta ativa");
         }
 
         return newAccount;
@@ -50,7 +52,7 @@ public class AccountService {
         var account = database.getAccounts().stream()
                 .filter(acc -> acc.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada"));
 
         return account.getBalance();
     }
@@ -60,10 +62,10 @@ public class AccountService {
         Account account = database.getAccounts().stream()
                 .filter(acc -> acc.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada"));
 
         if(amount < 0){
-            throw new Error("Valor inválido");
+            throw new BusinessException("Valor inválido");
         }else{
             newBalance = account.getBalance() + amount;
             account.setBalance(newBalance);
@@ -78,12 +80,12 @@ public class AccountService {
         Account account = database.getAccounts().stream()
                 .filter(acc -> acc.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada"));
 
         if(amount < 0){
-            throw new Error("Valor inválido");
+            throw new BusinessException("Valor inválido");
         }else if(amount > account.getBalance()){
-            throw new Error("Valor inválido");
+            throw new BusinessException("Valor inválido");
         }else{
             newBalance = account.getBalance() - amount;
             account.setBalance(newBalance);
@@ -98,15 +100,15 @@ public class AccountService {
         var account1 = database.getAccounts().stream()
                 .filter(acc -> acc.getId().equals(transferDto.getAccountFrom()))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada"));
 
         var account2 = database.getAccounts().stream()
                 .filter(acc -> acc.getId().equals(transferDto.getAccountTo()))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada"));
 
         if(account1.getBalance() < transferDto.getAmount()){
-            throw  new Error("Saldo insuficiente");
+            throw  new BusinessException("Saldo insuficiente");
         }
 
         var newBalance1 = account1.getBalance() - transferDto.getAmount();

@@ -3,9 +3,10 @@ package br.com.leticiacouto.ProjetoBanco.service;
 import br.com.leticiacouto.ProjetoBanco.database.model.User;
 import br.com.leticiacouto.ProjetoBanco.database.repository.Database;
 import br.com.leticiacouto.ProjetoBanco.dto.UserDto;
+import br.com.leticiacouto.ProjetoBanco.exceptions.BusinessException;
+import br.com.leticiacouto.ProjetoBanco.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -28,11 +29,11 @@ public class UserService {
                 .build();
 
         if(userdto.getPassword().length() < 8){
-            throw new Error("Erro ao criar o usuário, senha fraca");
+            throw new BusinessException("Erro ao criar a senha, insira no mínimo 8 caracteres");
         }else if(userdto.getEmail().length() < 8){
-            throw new Error("Erro ao criar o usuário, email inválido");
+            throw new BusinessException("Erro ao criar o usuário, email inválido");
         }else if(userdto.getName().length() < 4){
-            throw new Error("Erro ao criar o usuário, nome inválido");
+            throw new BusinessException("Erro ao criar o usuário, nome inválido");
         }
 
         database.getUsers().add(newUser);
@@ -41,7 +42,7 @@ public class UserService {
 
     public Set<User> getAllUsers(){
         if(database.getUsers().isEmpty()){
-            throw new Error("Não existem usuários no banco de dados");
+            throw new ResourceNotFoundException("Não há usuários no sistema");
         }else{
             return database.getUsers();
         }
@@ -54,13 +55,14 @@ public class UserService {
                 .orElse(null);
 
         if(user == null){
-            throw new Error("Usuário não encontrado");
+            throw new ResourceNotFoundException("Usuário não encontrado");
         }else{
             return user;
         }
     }
 
     public User updateUser(UserDto userdto, int id) {
+//      erros já setados na função getUserByid
         User usuario = getUserById(id);
 
         usuario.setName(userdto.getName());
