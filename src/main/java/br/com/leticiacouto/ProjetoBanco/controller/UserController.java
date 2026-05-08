@@ -1,13 +1,14 @@
 package br.com.leticiacouto.ProjetoBanco.controller;
 
-import br.com.leticiacouto.ProjetoBanco.database.model.User;
+import br.com.leticiacouto.ProjetoBanco.database.model.UserEntity;
 import br.com.leticiacouto.ProjetoBanco.dto.UserDto;
 import br.com.leticiacouto.ProjetoBanco.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("user")
@@ -17,25 +18,25 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User userPost(@RequestBody UserDto userdto){
-        return userService.createUser(userdto);
+    public UserEntity userPost(@RequestBody UserDto userDto){
+        return userService.createUser(userDto);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Set<User> userGet(){
-        return userService.getAllUsers();
+    public List<UserEntity> userGet(){
+        return userService.findAll();
     }
 
     @GetMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public User userGet2(@PathVariable int id){
+    public UserEntity userGet2(@PathVariable UUID id){
         return userService.getUserById(id);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public User userPut(@RequestBody UserDto userdto,@PathVariable int id){
+    public UserEntity userPut(@RequestBody UserDto userdto,@PathVariable UUID id){
         return userService.updateUser(userdto, id);
     }
 }

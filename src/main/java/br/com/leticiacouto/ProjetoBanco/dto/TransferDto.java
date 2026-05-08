@@ -10,7 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransferDto {
+public class TransferDto{
     private UUID accountFrom;
     private UUID accountTo;
     private Double amount;
