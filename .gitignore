@@ -32,3 +32,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Application config (contains DB credentials) ###
+src/main/resources/application.yaml
