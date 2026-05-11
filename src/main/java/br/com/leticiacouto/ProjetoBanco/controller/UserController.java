@@ -1,6 +1,7 @@
 package br.com.leticiacouto.ProjetoBanco.controller;
 
 import br.com.leticiacouto.ProjetoBanco.database.model.UserEntity;
+import br.com.leticiacouto.ProjetoBanco.dto.DeleteUserDto;
 import br.com.leticiacouto.ProjetoBanco.dto.UserDto;
 import br.com.leticiacouto.ProjetoBanco.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +39,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserEntity userPut(@RequestBody UserDto userdto,@PathVariable UUID id){
         return userService.updateUser(userdto, id);
+    }
+
+    @DeleteMapping("/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public String userDelete(@RequestBody DeleteUserDto deleteUserDto){
+        return userService.deleteUser(deleteUserDto);
     }
 }

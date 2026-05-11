@@ -35,3 +35,4 @@ build/
 
 ### Application config (contains DB credentials) ###
 src/main/resources/application.yaml
+docs
