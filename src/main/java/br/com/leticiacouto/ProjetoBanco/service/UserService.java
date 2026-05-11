@@ -25,14 +25,16 @@ public class UserService {
     }
 
     public UserEntity createUser(UserDto userDto) {
-//      REGRA DE UM NAO DUPLICAR USUARIO(POR EMAIL)
-//      CRIPTOGRAFAR A SENHA
 
         UserEntity newUser = UserEntity.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .build();
+
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new BusinessException("Email já cadastrado");
+        }
 
         if(userDto.getPassword().length() < 8){
             throw new BusinessException("Erro ao criar a senha, insira no mínimo 8 caracteres");
