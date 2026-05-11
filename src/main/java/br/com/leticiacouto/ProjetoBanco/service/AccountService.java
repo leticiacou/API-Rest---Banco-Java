@@ -1,14 +1,17 @@
 package br.com.leticiacouto.ProjetoBanco.service;
 
 import br.com.leticiacouto.ProjetoBanco.database.model.AccountEntity;
+import br.com.leticiacouto.ProjetoBanco.database.model.TransactionEntity;
 import br.com.leticiacouto.ProjetoBanco.database.model.UserEntity;
 import br.com.leticiacouto.ProjetoBanco.database.repository.IAccountRepository;
+import br.com.leticiacouto.ProjetoBanco.database.repository.ITransactionRepository;
 import br.com.leticiacouto.ProjetoBanco.database.repository.IUserRepository;
 import br.com.leticiacouto.ProjetoBanco.dto.TransferDto;
 import br.com.leticiacouto.ProjetoBanco.exceptions.BusinessException;
 import br.com.leticiacouto.ProjetoBanco.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -17,10 +20,12 @@ public class AccountService {
 
     private final IAccountRepository accountRepository;
     private final IUserRepository userRepository;
+    private final ITransactionRepository transactionRepository;
 
-    public AccountService(IAccountRepository accountRepository, IUserRepository userRepository) {
+    public AccountService(IAccountRepository accountRepository, IUserRepository userRepository,  ITransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public AccountEntity createAccount(UUID userId) {
@@ -56,6 +61,13 @@ public class AccountService {
             account.setBalance(newBalance);
         }
 
+        TransactionEntity newTransaction = TransactionEntity.builder()
+                .amount(amount)
+                .type("deposit")
+                .account(account)
+                .build();
+
+        transactionRepository.save(newTransaction);
         return accountRepository.save(account).getBalance();
     }
 
@@ -71,6 +83,14 @@ public class AccountService {
             newBalance = account.getBalance() - amount;
             account.setBalance(newBalance);
         }
+
+        TransactionEntity newTransaction = TransactionEntity.builder()
+                .amount(amount)
+                .type("withdraw")
+                .account(account)
+                .build();
+
+        transactionRepository.save(newTransaction);
 
         return accountRepository.save(account).getBalance();
     }
@@ -99,6 +119,21 @@ public class AccountService {
         accountRepository.save(accountFrom);
         accountRepository.save(accountTo);
 
+        TransactionEntity newTransaction = TransactionEntity.builder()
+                .amount(transferDto.getAmount())
+                .type("transfer")
+                .account(accountFrom)
+                .build();
+
+        transactionRepository.save(newTransaction);
+
         return "O saldo atualizado após a transferencia é " + newBalance1;
+    }
+
+    public List<TransactionEntity> getTransactions(UUID id) {
+        AccountEntity account = accountRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada"));
+
+        return transactionRepository.findAllByAccount(account);
     }
 }
