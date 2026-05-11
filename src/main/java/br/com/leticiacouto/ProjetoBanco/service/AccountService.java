@@ -4,6 +4,7 @@ import br.com.leticiacouto.ProjetoBanco.database.model.AccountEntity;
 import br.com.leticiacouto.ProjetoBanco.database.model.UserEntity;
 import br.com.leticiacouto.ProjetoBanco.database.repository.IAccountRepository;
 import br.com.leticiacouto.ProjetoBanco.database.repository.IUserRepository;
+import br.com.leticiacouto.ProjetoBanco.dto.TransferDto;
 import br.com.leticiacouto.ProjetoBanco.exceptions.BusinessException;
 import br.com.leticiacouto.ProjetoBanco.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -75,20 +76,29 @@ public class AccountService {
     }
 
 
-    //    FAZER ESSA FUNCAO FUNCIONAR
-//    public String transferMoney(TransferDto transferDto) {
-//        var account1 = transferDto.getAccountFrom();
-//        var account2 = transferDto.getAccountTo();
-//
-//        if(account1.() < transferDto.getAmount()){
-//            throw  new BusinessException("Saldo insuficiente");
-//        }
-//
-//        var newBalance1 = account1.getBalance() - transferDto.getAmount();
-//        account1.setBalance(newBalance1);
-//        var newBalance2 = account2.getBalance() + transferDto.getAmount();
-//        account2.setBalance(newBalance2);
-//
-//        return "O saldo atualizado após a transferencia é " + newBalance1;
-//    }
+    public String transferMoney(TransferDto transferDto) {
+        UUID account1ID = transferDto.getAccountFrom();
+        UUID account2ID = transferDto.getAccountTo();
+
+        AccountEntity accountFrom = accountRepository.findById(account1ID)
+                .orElseThrow(() -> new ResourceNotFoundException("Conta origem não encontrada"));
+        AccountEntity accountTo = accountRepository.findById(account2ID)
+                .orElseThrow(() -> new ResourceNotFoundException("Conta de destino não encontrada"));
+
+        if(accountFrom == null || accountTo == null) {
+            throw new ResourceNotFoundException("Conta não encontrada");
+        }else if(accountFrom.getBalance() < transferDto.getAmount()) {
+            throw  new BusinessException("Saldo insuficiente");
+        }
+
+        var newBalance1 = accountFrom.getBalance() - transferDto.getAmount();
+        accountFrom.setBalance(newBalance1);
+        var newBalance2 = accountTo.getBalance() + transferDto.getAmount();
+        accountTo.setBalance(newBalance2);
+
+        accountRepository.save(accountFrom);
+        accountRepository.save(accountTo);
+
+        return "O saldo atualizado após a transferencia é " + newBalance1;
+    }
 }

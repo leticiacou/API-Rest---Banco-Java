@@ -1,6 +1,7 @@
 package br.com.leticiacouto.ProjetoBanco.controller;
 
 import br.com.leticiacouto.ProjetoBanco.database.model.AccountEntity;
+import br.com.leticiacouto.ProjetoBanco.dto.TransferDto;
 import br.com.leticiacouto.ProjetoBanco.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,10 +42,10 @@ public class AccountController {
         return accountService.withdraw(id, amount);
     }
 
-//    FAZER ESSA FUNCAO FUNCIONAR
-//    @PatchMapping("/transfer")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public String transferMoney(@RequestBody TransferDto transferDto) {
-//        return accountService.transferMoney(transferDto);
-//    }
+    @PutMapping("/transfer")
+    @ResponseStatus(HttpStatus.CREATED)
+    public String transferMoney(@RequestBody TransferDto transferDto) {
+        System.out.println(transferDto);
+        return accountService.transferMoney(transferDto);
+    }
 }
