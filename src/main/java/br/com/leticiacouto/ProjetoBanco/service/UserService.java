@@ -5,6 +5,8 @@ import br.com.leticiacouto.ProjetoBanco.database.repository.IUserRepository;
 import br.com.leticiacouto.ProjetoBanco.dto.UserDto;
 import br.com.leticiacouto.ProjetoBanco.exceptions.BusinessException;
 import br.com.leticiacouto.ProjetoBanco.exceptions.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +14,9 @@ import java.util.UUID;
 
 @Service
 public class UserService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final IUserRepository userRepository;
 
@@ -26,7 +31,7 @@ public class UserService {
         UserEntity newUser = UserEntity.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
-                .password(userDto.getPassword())
+                .password(passwordEncoder.encode(userDto.getPassword()))
                 .build();
 
         if(userDto.getPassword().length() < 8){
